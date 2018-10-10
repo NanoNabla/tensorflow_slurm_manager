@@ -22,6 +22,8 @@ class SlurmClusterManager():
         self.my_proc_id = int(os.environ['SLURM_PROCID']) # index into hostnames/num_tasks_per_host lists
         self.num_processes = int(os.environ['SLURM_NPROCS'])
         self.nnodes = int(os.environ['SLURM_NNODES'])
+        self._wk_strings = None
+        self._ps_strings = None
 
         # Sanity check that everything has been parsed correctly
         assert len(self.hostnames) == len(self.num_tasks_per_host)
@@ -84,6 +86,10 @@ class SlurmClusterManager():
         # Each processor: Grab your Job/TaskID
         job     = proc_info[self.my_proc_id][1]
         task_id = proc_info[self.my_proc_id][2]
+
+        # Set it for later usage
+        self._wk_strings = wk_strings
+        self._ps_strings = ps_strings
 
         # Return it all!  :D
         cluster_spec = tf.train.ClusterSpec({'worker': wk_strings, 'ps': ps_strings})
