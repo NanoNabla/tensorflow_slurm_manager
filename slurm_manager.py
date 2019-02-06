@@ -2,7 +2,7 @@ from __future__ import print_function
 import os
 import hostlist
 import tensorflow as tf
-import re
+import argparse
 
 ## it may be useful to know that slurm_nodeid tells you which node you are one (in case there is more than one task on any given node...)
 ## Perhaps you could better assign parameter servers be distributed across all nodes before doubleing up on one.
