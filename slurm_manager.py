@@ -24,6 +24,8 @@ class SlurmClusterManager():
         self.nnodes = int(os.environ['SLURM_NNODES'])
         self._wk_strings = None
         self._ps_strings = None
+        self._job = None
+        self._task_id = None
 
         # Sanity check that everything has been parsed correctly
         assert len(self.hostnames) == len(self.num_tasks_per_host)
@@ -90,6 +92,8 @@ class SlurmClusterManager():
         # Set it for later usage
         self._wk_strings = wk_strings
         self._ps_strings = ps_strings
+        self._job = job
+        self._task_id = task_id
 
         # Return it all!  :D
         cluster_spec = tf.train.ClusterSpec({'worker': wk_strings, 'ps': ps_strings})
@@ -116,3 +120,20 @@ class SlurmClusterManager():
             else:
                 final_list.append(int(node))
         return final_list
+
+    def print_cluster_spec(self):
+        if self._wk_strings == None:
+            self.build_cluster_spec()
+        print(self._wk_strings, self._ps_strings, self._job, self._task_id, sep=";")
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+    description = 'get cluster spec')
+    parser.add_argument('--num_param_servers', type=int, required=False, default=1, help = 'number of parameter servers')
+    parser.add_argument('--num_worker_servers', type=int, required=False, default=1, help = 'number of worker servers')
+    parser.add_argument('--starting_port', type=int, required=False, default=2222, help = 'starting port')
+
+    args = parser.parse_args()
+
+    manager = SlurmClusterManager(args.num_param_servers, args.num_worker_servers, args.starting_port)
+    manager.print_cluster_spec()
